@@ -85,36 +85,23 @@ export const Navbar: React.FC = () => {
             </ul>
           </div>
 
-          <Link to="/portfolio" className={`nav-link ${location.pathname === '/portfolio' ? 'active' : ''}`}>
-            Our Work
-          </Link>
-
           {/* Profile Dropdown */}
           <div
             className="nav-dropdown"
             onMouseEnter={() => setProfileOpen(true)}
             onMouseLeave={() => setProfileOpen(false)}
           >
-            <span
+            <Link
+              to="/profile/founder"
               className={`nav-link ${location.pathname.startsWith('/profile') ? 'active' : ''}`}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
               Profile <ChevronDown size={14} />
-            </span>
-            <ul className={`dropdown-menu ${profileOpen ? 'visible' : ''}`}>
+            </Link>
+            <ul className={`dropdown-menu ${profileOpen ? 'visible' : ''}`} style={{ minWidth: '180px' }}>
               <li>
                 <Link to="/profile/founder" className="dropdown-item">
-                  Founder
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile/team" className="dropdown-item">
-                  Meet Our Team
-                </Link>
-              </li>
-              <li>
-                <Link to="/profile/culture" className="dropdown-item">
-                  Life at Dygytaly
+                  Founder Profile →
                 </Link>
               </li>
             </ul>
@@ -130,8 +117,8 @@ export const Navbar: React.FC = () => {
 
           {/* Mobile CTA */}
           <div className="mobile-only" style={{ display: 'none', width: '100%', marginTop: '16px' }}>
-            <Link to="/contact" className="btn btn-primary" style={{ width: '100%' }}>
-              <Coffee size={18} /> Let's Catch Up ☕
+            <Link to="/contact" className="btn btn-primary" style={{ width: '100%', padding: '12px 20px', fontSize: '1rem' }}>
+              <Coffee size={20} /> Let's Catch Up ☕
             </Link>
           </div>
         </nav>
@@ -140,15 +127,40 @@ export const Navbar: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <a
             href="tel:+919677759959"
-            className="btn btn-outline btn-sm"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#ffffff',
+              fontWeight: 600,
+              fontSize: '0.92rem',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
+              textDecoration: 'none',
+              transition: 'all 0.2s ease'
+            }}
             title="Call Dygytaly"
           >
-            <Phone size={14} /> +91 96777 59959
+            <Phone size={14} color="var(--color-tangerine)" /> +91 96777 59959
           </a>
 
-          <Link to="/contact" className="btn btn-primary btn-sm">
-            <Coffee size={16} /> Let's Catch Up ☕
+          <Link
+            to="/contact"
+            className="btn btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 22px',
+              fontSize: '0.96rem',
+              fontWeight: 700,
+              boxShadow: '0 4px 18px rgba(255, 107, 53, 0.45)',
+              borderRadius: '24px'
+            }}
+          >
+            <Coffee size={18} /> Let's Catch Up ☕
           </Link>
 
           {/* Mobile Nav Toggle */}
@@ -156,6 +168,7 @@ export const Navbar: React.FC = () => {
             className="mobile-nav-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
+            style={{ color: '#fff' }}
           >
             {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
           </button>

@@ -146,10 +146,7 @@ export const Footer: React.FC = () => {
             <h5>Company</h5>
             <ul className="footer-links">
               <li><Link to="/about">About Dygytaly</Link></li>
-              <li><Link to="/portfolio">Selected Work</Link></li>
               <li><Link to="/profile/founder">Founder Story</Link></li>
-              <li><Link to="/profile/team">Meet Our Team</Link></li>
-              <li><Link to="/profile/culture">Life at Dygytaly</Link></li>
               <li><Link to="/careers">Careers (We're Hiring!)</Link></li>
               <li><Link to="/contact">Contact & Location</Link></li>
               <li><Link to="/privacy">Privacy Policy</Link></li>

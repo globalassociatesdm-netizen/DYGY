@@ -17,26 +17,27 @@ export const ThreeCoffeeCanvas: React.FC = () => {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 2.5, 4.5);
-    camera.lookAt(0, 0.3, 0);
+    camera.position.set(0, 1.9, 3.1);
+    camera.lookAt(0, 0.35, 0);
 
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
     // Warm Ambient and Spot Lights
-    const ambientLight = new THREE.AmbientLight(0xfff3e0, 1.8);
+    const ambientLight = new THREE.AmbientLight(0xfff3e0, 2.0);
     scene.add(ambientLight);
 
-    const warmSpot = new THREE.SpotLight(0xF18A55, 3.5, 15, Math.PI / 4, 0.5);
+    const warmSpot = new THREE.SpotLight(0xF18A55, 3.8, 15, Math.PI / 4, 0.5);
     warmSpot.position.set(2, 5, 3);
     scene.add(warmSpot);
 
-    const rimLight = new THREE.DirectionalLight(0xC8B9E8, 2);
+    const rimLight = new THREE.DirectionalLight(0xC8B9E8, 2.2);
     rimLight.position.set(-3, 2, -2);
     scene.add(rimLight);
 
     const coffeeGroup = new THREE.Group();
+    coffeeGroup.scale.set(1.35, 1.35, 1.35);
     scene.add(coffeeGroup);
 
     // Ceramic Saucer
@@ -224,5 +225,5 @@ export const ThreeCoffeeCanvas: React.FC = () => {
     };
   }, []);
 
-  return <div ref={mountRef} className="coffee-cup-visual" style={{ width: '100%', height: '360px', cursor: 'grab' }} />;
+  return <div ref={mountRef} className="coffee-cup-visual" style={{ width: '100%', height: '420px', cursor: 'grab' }} />;
 };

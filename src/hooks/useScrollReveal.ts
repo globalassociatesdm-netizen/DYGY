@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Custom hook for scroll-based reveal animations using IntersectionObserver.
- * Elements with [data-reveal] attribute will animate in when visible.
+ * Custom hook for scroll-based reveal animations using IntersectionObserver & MutationObserver.
+ * Elements with [data-reveal] attribute will animate in when visible, including dynamically loaded content.
  */
-export function useScrollReveal(rootMargin = '-40px') {
+export function useScrollReveal(rootMargin = '60px') {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,16 +22,47 @@ export function useScrollReveal(rootMargin = '-40px') {
       },
       {
         rootMargin,
-        threshold: 0.08,
+        threshold: 0.02,
       }
     );
 
-    // Observe all elements with data-reveal attribute
-    const revealElements = container.querySelectorAll('[data-reveal]');
-    revealElements.forEach((el) => observer.observe(el));
+    const checkAndObserve = () => {
+      const elements = container.querySelectorAll('[data-reveal]:not(.revealed)');
+      const windowHeight = window.innerHeight;
+      elements.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        // If element is in viewport or already scrolled past, reveal it
+        if (rect.top <= windowHeight + 80 && rect.bottom >= -80) {
+          el.classList.add('revealed');
+        } else {
+          observer.observe(el);
+        }
+      });
+    };
+
+    // Run immediately and after a short tick
+    checkAndObserve();
+    const timer = setTimeout(checkAndObserve, 50);
+
+    // Watch for dynamic DOM additions (e.g. API fetches resolving)
+    const mutationObserver = new MutationObserver(() => {
+      checkAndObserve();
+    });
+
+    mutationObserver.observe(container, {
+      childList: true,
+      subtree: true,
+    });
+
+    window.addEventListener('scroll', checkAndObserve, { passive: true });
+    window.addEventListener('resize', checkAndObserve, { passive: true });
 
     return () => {
-      revealElements.forEach((el) => observer.unobserve(el));
+      clearTimeout(timer);
+      observer.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener('scroll', checkAndObserve);
+      window.removeEventListener('resize', checkAndObserve);
     };
   }, [rootMargin]);
 
@@ -41,6 +72,7 @@ export function useScrollReveal(rootMargin = '-40px') {
 /**
  * Returns CSS inline delay for staggered reveal animations.
  */
-export function staggerDelay(index: number, baseMs = 80): React.CSSProperties {
+export function staggerDelay(index: number, baseMs = 50): React.CSSProperties {
   return { transitionDelay: `${index * baseMs}ms` } as React.CSSProperties;
 }
+

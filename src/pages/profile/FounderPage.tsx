@@ -4,19 +4,45 @@ import { Quote, Coffee, ArrowRight, Sparkles, Award, Heart } from 'lucide-react'
 import { Linkedin, Instagram, Facebook } from '../../components/SocialIcons';
 import { useScrollReveal, staggerDelay } from '../../hooks/useScrollReveal';
 
+const DEFAULT_FOUNDER = {
+  name: 'Gowrishankar',
+  designation: 'Founder & Managing Director',
+  bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
+  full_bio: 'Every business starts with an idea. But turning that idea into something people notice, trust and choose takes more than a logo, a website or a few advertisements. It takes the right strategy, thoughtful creativity, useful technology and people who care about getting the details right. That is the conviction behind Dygytaly. We are here to partner with business leaders who want to think bigger, work smarter and build enduring commercial equity in Coimbatore and beyond.',
+  quote: 'I believe businesses deserve more than just vendors. They deserve thoughtful strategies and a partner who truly understands their vision.',
+  social_links: {
+    linkedin: 'https://www.linkedin.com/company/dygytaly/',
+    instagram: 'https://www.instagram.com/dygytaly_official/?hl=en'
+  },
+  story_points: [
+    { number: '01', title: 'Every Big Idea Starts Somewhere.', quote: 'Not with all the answers, but with the courage to begin and the ambition to build something meaningful.' },
+    { number: '02', title: 'Built on a Vision. Driven by Possibilities.', quote: 'I believe businesses deserve more than just services. They deserve thoughtful strategies and a partner who understands their vision.' },
+    { number: '03', title: 'Turning Ideas Into Action.', quote: 'That belief became the foundation of Dygytaly — bringing marketing, creativity and technology together to help businesses move forward.' },
+    { number: '04', title: 'Growth Is Never a One-Person Journey.', quote: 'Behind every milestone are people, lessons, challenges and relationships that make the journey worthwhile.' },
+    { number: '05', title: 'Ambition With Accountability.', quote: 'I believe trust is earned through honest conversations, responsible decisions and a commitment to doing the work right.' },
+    { number: '06', title: 'The Vision Is Bigger Than Today.', quote: 'My goal is to build Dygytaly into a trusted digital partner that helps businesses think bigger, work smarter and grow with confidence.' },
+    { number: '07', title: 'And We\'re Just Getting Started.', quote: 'Every business has a next chapter. If you have a vision you\'re ready to pursue, I\'d love to hear about it.' }
+  ]
+};
+
 export const FounderPage: React.FC = () => {
-  const [founder, setFounder] = useState<any>(null);
+  const [founder, setFounder] = useState<any>(DEFAULT_FOUNDER);
   const scrollRef = useScrollReveal();
 
   useEffect(() => {
     fetch('/api/founder')
       .then(res => res.json())
-      .then(data => setFounder(data))
+      .then(data => {
+        if (data && data.name) {
+          setFounder(data);
+        }
+      })
       .catch(() => {});
   }, []);
 
-  const storyPoints = founder?.story_points || [];
-  const milestones = founder?.milestones || [];
+  const storyPoints = (founder?.story_points && founder.story_points.length > 0)
+    ? founder.story_points
+    : DEFAULT_FOUNDER.story_points;
 
   return (
     <div className="founder-page" ref={scrollRef} style={{ paddingTop: '100px' }}>
@@ -37,12 +63,11 @@ export const FounderPage: React.FC = () => {
       <section className="section-py" style={{ background: 'var(--color-warm-ivory)' }}>
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '50px', alignItems: 'center' }}>
-            <div data-reveal="left" className="glass-card" style={{ padding: '30px', textAlign: 'center' }}>
-              <div style={{ background: 'var(--color-aubergine)', borderRadius: 'var(--radius-md)', padding: '40px', marginBottom: '20px' }}>
+            <div data-reveal="left" className="glass-card" style={{ padding: '36px 30px', textAlign: 'center' }}>
+              <div className="founder-img-wrapper">
                 <img
                   src="/uploads/dygytaly-logo.png"
                   alt="Dygytaly Agency Founder"
-                  style={{ maxHeight: '160px', margin: '0 auto', objectFit: 'contain' }}
                 />
               </div>
               <h2 style={{ fontSize: '1.6rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>

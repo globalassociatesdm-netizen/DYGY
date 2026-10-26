@@ -3,8 +3,67 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ExternalLink, Filter, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useScrollReveal, staggerDelay } from '../hooks/useScrollReveal';
 
+const DEFAULT_PORTFOLIO = [
+  {
+    id: 1,
+    title: 'Precision Lead Engine for Regional Manufacturer',
+    client_name: 'Industrial Equipment Manufacturer',
+    industry: 'Manufacturing & B2B',
+    category: 'Google Ads',
+    challenge: 'High cost-per-click and unqualified search enquiries were wasting 60% of monthly digital advertising spend.',
+    strategy: 'Restructured Google Search campaigns into exact-match commercial intent clusters, implemented negative keyword pruning, and built dedicated technical landing pages.',
+    execution: 'Launched segmented Search & Performance Max campaigns with server-side conversion tracking linked directly to the client CRM.',
+    results: 'Achieved 42% reduction in Cost Per Acquisition (CPA) and 3.4x increase in sales-qualified commercial inquiries over 90 days.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/google-ads',
+    is_featured: 1
+  },
+  {
+    id: 2,
+    title: 'Full Brand Identity & E-Commerce Web Experience',
+    client_name: 'D2C Lifestyle & Apparel Brand',
+    industry: 'Retail & Fashion',
+    category: 'Websites',
+    challenge: 'Outdated website with poor mobile checkout was causing 74% cart abandonment and failing to project premium brand authority.',
+    strategy: 'Complete brand repositioning, bespoke typography, and a modern, high-speed responsive web storefront with 1-click checkout.',
+    execution: 'Developed a custom responsive website with sub-second page loads, elegant product showcases, and interactive 3D product previews.',
+    results: 'Cart abandonment dropped to 41%, mobile conversion rate increased by 68%, and average session duration doubled.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/website-development',
+    is_featured: 1
+  },
+  {
+    id: 3,
+    title: 'Local SEO Dominance for Healthcare Clinic',
+    client_name: 'Multi-Speciality Healthcare Clinic',
+    industry: 'Healthcare & Wellness',
+    category: 'SEO',
+    challenge: 'Ranked on page 3 for key medical search terms in Coimbatore, resulting in near-zero inbound phone calls.',
+    strategy: 'Optimized Google Business Profile, established consistent local citations, created localized health service pages, and automated patient review collection.',
+    execution: 'Systematic on-page technical optimization, schema markup integration, and geo-targeted service content.',
+    results: 'Ranked in the Google Maps Local 3-Pack for 14 target medical queries; incoming phone calls increased by 185% in 5 months.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/local-seo',
+    is_featured: 1
+  },
+  {
+    id: 4,
+    title: 'Viral Reel Campaign & Social Brand Launch',
+    client_name: 'Specialty Gourmet Cafe & Roastery',
+    industry: 'Food & Hospitality',
+    category: 'Video',
+    challenge: 'Low organic reach on Instagram and lack of awareness among Coimbatore coffee enthusiasts prior to store launch.',
+    strategy: 'Created an aesthetic 5-part storytelling video series highlighting artisan coffee roasting, brewing crafts, and ambient cafe workspace aesthetics.',
+    execution: 'Scripted, filmed, and produced fast-paced short-form reels with dynamic motion graphics, custom audio design, and micro-influencer collaboration.',
+    results: 'Over 450,000 organic video views across Coimbatore; opening weekend footfall exceeded capacity by 200%.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/social-media-video',
+    is_featured: 1
+  }
+];
+
 export const PortfolioPage: React.FC = () => {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>(DEFAULT_PORTFOLIO);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [activeProject, setActiveProject] = useState<any | null>(null);
   const scrollRef = useScrollReveal();
@@ -12,7 +71,11 @@ export const PortfolioPage: React.FC = () => {
   useEffect(() => {
     fetch('/api/portfolio')
       .then(res => res.json())
-      .then(data => setProjects(data))
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProjects(data);
+        }
+      })
       .catch(() => {});
   }, []);
 

@@ -10,21 +10,179 @@ import { ThreeCoffeeCanvas } from '../components/ThreeCoffeeCanvas';
 import { CoffeeCatchUpForm } from '../components/CoffeeCatchUpForm';
 import { useScrollReveal, staggerDelay } from '../hooks/useScrollReveal';
 
+const DEFAULT_SERVICES = [
+  { slug: 'google-ads', title: 'Google Ads', tagline: 'Be There When Customers Are Searching.', short_desc: 'Reach high-intent audiences actively searching for your products and services with high-converting Search, Performance Max, Display, and Remarketing campaigns.', icon_name: 'Search' },
+  { slug: 'meta-ads', title: 'Meta Ads', tagline: 'Turn Attention Into Measurable Action.', short_desc: 'Engage laser-targeted audiences on Facebook and Instagram through thumb-stopping creatives, strategic funnel architectures, and precise retargeting.', icon_name: 'Share2' },
+  { slug: 'website-development', title: 'Website Development', tagline: 'Your Best Salesperson Never Sleeps.', short_desc: 'Fast, secure, responsive websites built with modern engineering standards to establish authority and turn casual visitors into paying clients.', icon_name: 'Globe' },
+  { slug: 'application-development', title: 'Application Development', tagline: 'Custom Software Built Around Your Workflow.', short_desc: 'Custom web apps, progressive web applications, and internal tools engineered for seamless performance and effortless business scalability.', icon_name: 'Layers' },
+  { slug: 'crm-solutions', title: 'CRM Solutions', tagline: 'Never Let a Valuable Lead Slip Away.', short_desc: 'Centralized lead management, automated sales pipelines, and customer relationship systems tailored to close more deals with less manual follow-up.', icon_name: 'Users' },
+  { slug: 'erp-solutions', title: 'ERP Solutions', tagline: 'One Platform. Total Operational Clarity.', short_desc: 'Unified business technology connecting inventory, accounts, project milestones, and internal communication into one intuitive single source of truth.', icon_name: 'Database' },
+  { slug: 'website-seo', title: 'Website SEO', tagline: 'Earn Visibility That Grows Month Over Month.', short_desc: 'Comprehensive technical audits, on-page optimization, and high-authority content strategies that earn defensible organic rank for keywords that actually convert.', icon_name: 'TrendingUp' },
+  { slug: 'local-seo', title: 'Local SEO', tagline: 'Dominate Search Results in Your City.', short_desc: 'Optimized Google Business Profiles, localized citations, and review generation systems that drive high-intent local calls, visits, and enquiries.', icon_name: 'MapPin' },
+  { slug: 'branding-design', title: 'Branding & Design', tagline: 'Make Your Brand Impossible to Ignore.', short_desc: 'Distinctive visual identities, logo marks, brand guidelines, and creative collateral that build instant credibility and separate you from competitors.', icon_name: 'Palette' },
+  { slug: 'social-media-video', title: 'Social Media Video', tagline: 'Stories That Hold Attention and Build Trust.', short_desc: 'Professional short-form reels, product showcases, and testimonial videos planned, scripted, and edited for maximum reach across modern platforms.', icon_name: 'Video' }
+];
+
+const DEFAULT_PORTFOLIO = [
+  {
+    id: 1,
+    title: 'Precision Lead Engine for Regional Manufacturer',
+    client_name: 'Industrial Equipment Manufacturer',
+    industry: 'Manufacturing & B2B',
+    category: 'Google Ads',
+    challenge: 'High cost-per-click and unqualified search enquiries were wasting 60% of monthly digital advertising spend.',
+    strategy: 'Restructured Google Search campaigns into exact-match commercial intent clusters, implemented negative keyword pruning, and built dedicated technical landing pages.',
+    execution: 'Launched segmented Search & Performance Max campaigns with server-side conversion tracking linked directly to the client CRM.',
+    results: 'Achieved 42% reduction in Cost Per Acquisition (CPA) and 3.4x increase in sales-qualified commercial inquiries over 90 days.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/google-ads',
+    is_featured: 1
+  },
+  {
+    id: 2,
+    title: 'Full Brand Identity & E-Commerce Web Experience',
+    client_name: 'D2C Lifestyle & Apparel Brand',
+    industry: 'Retail & Fashion',
+    category: 'Websites',
+    challenge: 'Outdated website with poor mobile checkout was causing 74% cart abandonment and failing to project premium brand authority.',
+    strategy: 'Complete brand repositioning, bespoke typography, and a modern, high-speed responsive web storefront with 1-click checkout.',
+    execution: 'Developed a custom responsive website with sub-second page loads, elegant product showcases, and interactive 3D product previews.',
+    results: 'Cart abandonment dropped to 41%, mobile conversion rate increased by 68%, and average session duration doubled.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/website-development',
+    is_featured: 1
+  },
+  {
+    id: 3,
+    title: 'Local SEO Dominance for Healthcare Clinic',
+    client_name: 'Multi-Speciality Healthcare Clinic',
+    industry: 'Healthcare & Wellness',
+    category: 'SEO',
+    challenge: 'Ranked on page 3 for key medical search terms in Coimbatore, resulting in near-zero inbound phone calls.',
+    strategy: 'Optimized Google Business Profile, established consistent local citations, created localized health service pages, and automated patient review collection.',
+    execution: 'Systematic on-page technical optimization, schema markup integration, and geo-targeted service content.',
+    results: 'Ranked in the Google Maps Local 3-Pack for 14 target medical queries; incoming phone calls increased by 185% in 5 months.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/local-seo',
+    is_featured: 1
+  },
+  {
+    id: 4,
+    title: 'Viral Reel Campaign & Social Brand Launch',
+    client_name: 'Specialty Gourmet Cafe & Roastery',
+    industry: 'Food & Hospitality',
+    category: 'Video',
+    challenge: 'Low organic reach on Instagram and lack of awareness among Coimbatore coffee enthusiasts prior to store launch.',
+    strategy: 'Created an aesthetic 5-part storytelling video series highlighting artisan coffee roasting, brewing crafts, and ambient cafe workspace aesthetics.',
+    execution: 'Scripted, filmed, and produced fast-paced short-form reels with dynamic motion graphics, custom audio design, and micro-influencer collaboration.',
+    results: 'Over 450,000 organic video views across Coimbatore; opening weekend footfall exceeded capacity by 200%.',
+    image_url: '/uploads/dygytaly-logo.png',
+    project_url: '/services/social-media-video',
+    is_featured: 1
+  }
+];
+
+const DEFAULT_TESTIMONIALS = [
+  {
+    id: 1,
+    author_name: 'Senthil Kumar',
+    business_name: 'TexStyle Manufacturing',
+    rating: 5.0,
+    review_text: 'Dygytaly completely transformed our digital strategy. They took the time to understand our textile machinery sales cycle and built a Google Ads campaign that delivered high-value commercial leads right from month one.',
+    source: 'Google Review',
+    source_url: 'https://maps.app.goo.gl/dygytaly',
+    is_verified: 1
+  },
+  {
+    id: 2,
+    author_name: 'Priya Ramanathan',
+    business_name: 'Aura Interior Architecture',
+    rating: 5.0,
+    review_text: 'The best digital agency in Coimbatore by far. They designed a gorgeous website that truly represents our design standards, and their local SEO work helped us secure major commercial interior contracts.',
+    source: 'Google Review',
+    source_url: 'https://maps.app.goo.gl/dygytaly',
+    is_verified: 1
+  },
+  {
+    id: 3,
+    author_name: 'Karthik Raja',
+    business_name: 'Apex Precision Engineering',
+    rating: 5.0,
+    review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and his team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
+    source: 'Google Review',
+    source_url: 'https://maps.app.goo.gl/dygytaly',
+    is_verified: 1
+  }
+];
+
+const DEFAULT_FAQS = [
+  {
+    question: 'What services does Dygytaly offer?',
+    answer: 'Dygytaly is a full-service digital marketing and technology agency. We offer Google Ads, Meta Ads (Facebook & Instagram), Website Development, Custom Application Development, CRM & ERP Solutions, Website SEO, Local SEO (Google Business Profile), Branding & Graphic Design, and Social Media Video Production.'
+  },
+  {
+    question: 'Can I hire Dygytaly for a single service?',
+    answer: 'Yes! While many clients partner with us for integrated marketing and technology, you can engage us specifically for individual solutions such as building a website, running Google Ads, or optimizing Local SEO.'
+  },
+  {
+    question: 'Do you work with startups and established businesses?',
+    answer: 'Yes, we work with ambitious startups needing a strong launch identity and scalable website, as well as established SMEs looking to modernize their systems, automate follow-ups, and accelerate customer acquisition.'
+  },
+  {
+    question: 'How do we get started?',
+    answer: 'Simply click "Let\'s Catch Up Over Coffee" to tell us a little about your goals. We will connect with you, discuss your requirements without pressure or jargon, and recommend a clear, actionable plan.'
+  }
+];
+
+const DEFAULT_FOUNDER_HOME = {
+  name: 'Gowrishankar',
+  designation: 'Founder & Managing Director',
+  bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
+  story_points: [
+    { number: '01', title: 'Every Big Idea Starts Somewhere.', quote: 'Not with all the answers, but with the courage to begin and the ambition to build something meaningful.' },
+    { number: '02', title: 'Built on a Vision. Driven by Possibilities.', quote: 'I believe businesses deserve more than just services. They deserve thoughtful strategies and a partner who understands their vision.' },
+    { number: '03', title: 'Turning Ideas Into Action.', quote: 'That belief became the foundation of Dygytaly — bringing marketing, creativity and technology together to help businesses move forward.' },
+    { number: '04', title: 'Growth Is Never a One-Person Journey.', quote: 'Behind every milestone are people, lessons, challenges and relationships that make the journey worthwhile.' },
+    { number: '05', title: 'Ambition With Accountability.', quote: 'I believe trust is earned through honest conversations, responsible decisions and a commitment to doing the work right.' },
+    { number: '06', title: 'The Vision Is Bigger Than Today.', quote: 'My goal is to build Dygytaly into a trusted digital partner that helps businesses think bigger, work smarter and grow with confidence.' },
+    { number: '07', title: 'And We\'re Just Getting Started.', quote: 'Every business has a next chapter. If you have a vision you\'re ready to pursue, I\'d love to hear about it.' }
+  ]
+};
+
 export const HomePage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
-  const [services, setServices] = useState<any[]>([]);
-  const [portfolio, setPortfolio] = useState<any[]>([]);
-  const [founder, setFounder] = useState<any>(null);
-  const [testimonials, setTestimonials] = useState<any[]>([]);
-  const [faqs, setFaqs] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
+  const [portfolio, setPortfolio] = useState<any[]>(DEFAULT_PORTFOLIO);
+  const [founder, setFounder] = useState<any>(DEFAULT_FOUNDER_HOME);
+  const [testimonials, setTestimonials] = useState<any[]>(DEFAULT_TESTIMONIALS);
+  const [faqs, setFaqs] = useState<any[]>(DEFAULT_FAQS);
 
   useEffect(() => {
     // Fetch live CMS data from backend
-    fetch('/api/services').then(res => res.json()).then(data => setServices(data)).catch(() => {});
-    fetch('/api/portfolio').then(res => res.json()).then(data => setPortfolio(data)).catch(() => {});
-    fetch('/api/founder').then(res => res.json()).then(data => setFounder(data)).catch(() => {});
-    fetch('/api/testimonials').then(res => res.json()).then(data => setTestimonials(data)).catch(() => {});
-    fetch('/api/faqs').then(res => res.json()).then(data => setFaqs(data)).catch(() => {});
+    fetch('/api/services')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setServices(data); })
+      .catch(() => {});
+
+    fetch('/api/portfolio')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setPortfolio(data); })
+      .catch(() => {});
+
+    fetch('/api/founder')
+      .then(res => res.json())
+      .then(data => { if (data && data.name) setFounder(data); })
+      .catch(() => {});
+
+    fetch('/api/testimonials')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setTestimonials(data); })
+      .catch(() => {});
+
+    fetch('/api/faqs')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setFaqs(data); })
+      .catch(() => {});
   }, []);
 
   const getServiceIcon = (iconName: string) => {
@@ -43,15 +201,9 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  const storyPoints = founder?.story_points || [
-    { number: '01', title: 'Every Big Idea Starts Somewhere.', quote: 'Not with all the answers, but with the courage to begin and the ambition to build something meaningful.' },
-    { number: '02', title: 'Built on a Vision. Driven by Possibilities.', quote: 'I believe businesses deserve more than just services. They deserve thoughtful strategies and a partner who understands their vision.' },
-    { number: '03', title: 'Turning Ideas Into Action.', quote: 'That belief became the foundation of Dygytaly — bringing marketing, creativity and technology together to help businesses move forward.' },
-    { number: '04', title: 'Growth Is Never a One-Person Journey.', quote: 'Behind every milestone are people, lessons, challenges and relationships that make the journey worthwhile.' },
-    { number: '05', title: 'Ambition With Accountability.', quote: 'I believe trust is earned through honest conversations, responsible decisions and a commitment to doing the work right.' },
-    { number: '06', title: 'The Vision Is Bigger Than Today.', quote: 'My goal is to build Dygytaly into a trusted digital partner that helps businesses think bigger, work smarter and grow with confidence.' },
-    { number: '07', title: 'And We\'re Just Getting Started.', quote: 'Every business has a next chapter. If you have a vision you\'re ready to pursue, I\'d love to hear about it.' }
-  ];
+  const storyPoints = (founder?.story_points && founder.story_points.length > 0)
+    ? founder.story_points
+    : DEFAULT_FOUNDER_HOME.story_points;
 
   const scrollRef = useScrollReveal();
 
@@ -323,11 +475,10 @@ export const HomePage: React.FC = () => {
           <div className="founder-story-container">
             {/* Left: Founder Card */}
             <div className="founder-portrait-card" data-reveal="left">
-              <div className="founder-img-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '30px' }}>
+              <div className="founder-img-wrapper">
                 <img
                   src="/uploads/dygytaly-logo.png"
                   alt="Dygytaly Agency Founder"
-                  style={{ maxHeight: '180px', objectFit: 'contain' }}
                 />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>
