@@ -1724,3 +1724,7 @@ button, input, textarea, select {
     background: none !important;
   }
 }
+
+/* Tailwind for shadcn & UI components */
+@tailwind utilities;
+
