@@ -694,7 +694,7 @@ export async function runSeed() {
       'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
       'With a deep commitment to thoughtful strategy and transparent execution, Gowrishankar established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, he champions a customer-first philosophy where business understanding always precedes technical recommendation.',
       'Good ideas deserve great execution. Let\'s have a coffee and turn your business vision into reality.',
-      '/uploads/dygytaly-logo.png',
+      '/uploads/founder-profile.jpg',
       JSON.stringify(storyPoints),
       JSON.stringify(milestones),
       JSON.stringify({
@@ -714,7 +714,7 @@ export async function runSeed() {
       'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
       'With a deep commitment to thoughtful strategy and transparent execution, Gowrishankar established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, he champions a customer-first philosophy where business understanding always precedes technical recommendation.',
       'Good ideas deserve great execution. Let\'s have a coffee and turn your business vision into reality.',
-      '/uploads/dygytaly-logo.png',
+      '/uploads/founder-profile.jpg',
       JSON.stringify(storyPoints),
       JSON.stringify(milestones),
       JSON.stringify({

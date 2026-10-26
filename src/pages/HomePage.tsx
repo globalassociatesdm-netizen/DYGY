@@ -137,6 +137,7 @@ const DEFAULT_FAQS = [
 const DEFAULT_FOUNDER_HOME = {
   name: 'Gowrishankar',
   designation: 'Founder & Managing Director',
+  portrait_url: '/uploads/founder-profile.jpg',
   bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
   story_points: [
     { number: '01', title: 'Every Big Idea Starts Somewhere.', quote: 'Not with all the answers, but with the courage to begin and the ambition to build something meaningful.' },
@@ -477,8 +478,8 @@ export const HomePage: React.FC = () => {
             <div className="founder-portrait-card" data-reveal="left">
               <div className="founder-img-wrapper">
                 <img
-                  src="/uploads/dygytaly-logo.png"
-                  alt="Dygytaly Agency Founder"
+                  src={founder?.portrait_url || founder?.image_url || '/uploads/founder-profile.jpg'}
+                  alt={founder?.name || 'Dygytaly Agency Founder'}
                 />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>

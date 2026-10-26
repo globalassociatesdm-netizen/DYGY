@@ -7,6 +7,7 @@ import { useScrollReveal, staggerDelay } from '../../hooks/useScrollReveal';
 const DEFAULT_FOUNDER = {
   name: 'Gowrishankar',
   designation: 'Founder & Managing Director',
+  portrait_url: '/uploads/founder-profile.jpg',
   bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
   full_bio: 'Every business starts with an idea. But turning that idea into something people notice, trust and choose takes more than a logo, a website or a few advertisements. It takes the right strategy, thoughtful creativity, useful technology and people who care about getting the details right. That is the conviction behind Dygytaly. We are here to partner with business leaders who want to think bigger, work smarter and build enduring commercial equity in Coimbatore and beyond.',
   quote: 'I believe businesses deserve more than just vendors. They deserve thoughtful strategies and a partner who truly understands their vision.',
@@ -66,8 +67,8 @@ export const FounderPage: React.FC = () => {
             <div data-reveal="left" className="glass-card" style={{ padding: '36px 30px', textAlign: 'center' }}>
               <div className="founder-img-wrapper">
                 <img
-                  src="/uploads/dygytaly-logo.png"
-                  alt="Dygytaly Agency Founder"
+                  src={founder?.portrait_url || founder?.image_url || '/uploads/founder-profile.jpg'}
+                  alt={founder?.name || 'Dygytaly Agency Founder'}
                 />
               </div>
               <h2 style={{ fontSize: '1.6rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>
