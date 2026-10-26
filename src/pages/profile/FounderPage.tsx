@@ -17,6 +17,7 @@ import {
 import { Linkedin, Instagram } from '../../components/SocialIcons';
 import { Founder3DCanvas } from '../../components/founder/Founder3DCanvas';
 import { CoffeeCatchUpForm } from '../../components/CoffeeCatchUpForm';
+import { SmokeCard } from '@/components/ui/smoke-card';
 
 interface StoryChapter {
   id: string;
@@ -201,9 +202,15 @@ export const FounderPage: React.FC = () => {
 
   return (
     <div className="storytelling-page">
-      {/* Editorial Header Hero */}
-      <section className="storytelling-hero">
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+      {/* Editorial Header Hero with Interactive Smoke Effect */}
+      <section className="storytelling-hero" style={{ position: 'relative' }}>
+        {/* Interactive Ethereal Smoke Effect Canvas Layer */}
+        <SmokeCard
+          className="absolute inset-0 w-full h-full bg-transparent border-0 rounded-none pointer-events-auto"
+          smokeColor="#F18A55"
+          listenToWindow={true}
+        />
+        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
           <div
             style={{
               display: 'inline-flex',

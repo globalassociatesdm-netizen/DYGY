@@ -69,3 +69,4 @@ export function TiltedGridHeroDemo() {
 }
 
 export default TiltedGridHeroDemo;
+export { SmokeCardDemo } from "./smoke-card-demo";
