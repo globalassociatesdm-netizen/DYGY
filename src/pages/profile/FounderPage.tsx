@@ -5,7 +5,7 @@ import { Linkedin, Instagram, Facebook } from '../../components/SocialIcons';
 import { useScrollReveal, staggerDelay } from '../../hooks/useScrollReveal';
 
 const DEFAULT_FOUNDER = {
-  name: 'Gowrishankar',
+  name: 'Gowri Jagadheeshwaran',
   designation: 'Founder & Managing Director',
   portrait_url: '/uploads/founder-profile.jpg',
   bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
@@ -72,7 +72,7 @@ export const FounderPage: React.FC = () => {
                 />
               </div>
               <h2 style={{ fontSize: '1.6rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>
-                {founder?.name || 'Gowrishankar'}
+                {founder?.name || 'Gowri Jagadheeshwaran'}
               </h2>
               <p style={{ color: 'var(--color-tangerine)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '18px' }}>
                 {founder?.designation || 'Founder & Managing Director'}

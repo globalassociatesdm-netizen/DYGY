@@ -108,7 +108,7 @@ const DEFAULT_TESTIMONIALS = [
     author_name: 'Karthik Raja',
     business_name: 'Apex Precision Engineering',
     rating: 5.0,
-    review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and his team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
+    review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and her team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
     source: 'Google Review',
     source_url: 'https://maps.app.goo.gl/dygytaly',
     is_verified: 1
@@ -135,7 +135,7 @@ const DEFAULT_FAQS = [
 ];
 
 const DEFAULT_FOUNDER_HOME = {
-  name: 'Gowrishankar',
+  name: 'Gowri Jagadheeshwaran',
   designation: 'Founder & Managing Director',
   portrait_url: '/uploads/founder-profile.jpg',
   bio: 'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
@@ -483,7 +483,7 @@ export const HomePage: React.FC = () => {
                 />
               </div>
               <h3 style={{ fontSize: '1.4rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>
-                {founder?.name || 'Gowrishankar'}
+                {founder?.name || 'Gowri Jagadheeshwaran'}
               </h3>
               <p style={{ color: 'var(--color-tangerine)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '14px' }}>
                 {founder?.designation || 'Founder & Managing Director'}

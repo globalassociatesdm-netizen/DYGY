@@ -689,10 +689,10 @@ export async function runSeed() {
         name = ?, designation = ?, bio = ?, full_bio = ?, quote = ?, portrait_url = ?, story_points = ?, milestones = ?, social_links = ?
       WHERE id = 1
     `, [
-      'Gowrishankar',
+      'Gowri Jagadheeshwaran',
       'Founder & Managing Director',
       'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
-      'With a deep commitment to thoughtful strategy and transparent execution, Gowrishankar established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, he champions a customer-first philosophy where business understanding always precedes technical recommendation.',
+      'With a deep commitment to thoughtful strategy and transparent execution, Gowri Jagadheeshwaran established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, she champions a customer-first philosophy where business understanding always precedes technical recommendation.',
       'Good ideas deserve great execution. Let\'s have a coffee and turn your business vision into reality.',
       '/uploads/founder-profile.jpg',
       JSON.stringify(storyPoints),
@@ -709,10 +709,10 @@ export async function runSeed() {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       1,
-      'Gowrishankar',
+      'Gowri Jagadheeshwaran',
       'Founder & Managing Director',
       'Creative strategist and digital architect passionate about helping ambitious businesses build commanding digital brands and scalable technology systems.',
-      'With a deep commitment to thoughtful strategy and transparent execution, Gowrishankar established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, he champions a customer-first philosophy where business understanding always precedes technical recommendation.',
+      'With a deep commitment to thoughtful strategy and transparent execution, Gowri Jagadheeshwaran established Dygytaly to bridge the gap between creative marketing and high-performance technology. Based in Coimbatore, she champions a customer-first philosophy where business understanding always precedes technical recommendation.',
       'Good ideas deserve great execution. Let\'s have a coffee and turn your business vision into reality.',
       '/uploads/founder-profile.jpg',
       JSON.stringify(storyPoints),
@@ -880,11 +880,11 @@ export async function runSeed() {
   // 7. Team Members
   const teamMembers = [
     {
-      name: 'Gowrishankar',
+      name: 'Gowri Jagadheeshwaran',
       designation: 'Founder & Creative Director',
       bio: 'Leading strategic vision, brand architecture, and client partnerships.',
       expertise: 'Brand Strategy, Growth Architecture, Business Tech',
-      image_url: '/uploads/dygytaly-logo.png',
+      image_url: '/uploads/founder-profile.jpg',
       linkedin_url: 'https://www.linkedin.com/company/dygytaly/',
       display_order: 1
     },
@@ -1115,7 +1115,7 @@ export async function runSeed() {
       author_name: 'Karthik Raja',
       business_name: 'Apex Precision Engineering',
       rating: 5.0,
-      review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and his team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
+      review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and her team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
       source: 'Google Review',
       source_url: 'https://maps.app.goo.gl/dygytaly',
       is_verified: 1,
