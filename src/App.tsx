@@ -14,6 +14,7 @@ import { CareersPage } from './pages/CareersPage';
 import { ContactPage } from './pages/ContactPage';
 import { LegalPage } from './pages/LegalPage';
 import { AdminPortal } from './admin/AdminPortal';
+import { InteractiveCanvasTrail } from './components/ui/interactive-canvas-trail';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -27,7 +28,8 @@ function ScrollToTop() {
 // Layout wrapper for public website
 function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative' }}>
+      <InteractiveCanvasTrail />
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <Navbar />
       <main id="main-content" className="page-enter" style={{ flexGrow: 1 }}>{children}</main>

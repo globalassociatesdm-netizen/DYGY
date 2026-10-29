@@ -42,16 +42,27 @@ export const ContactPage: React.FC = () => {
                   <div>
                     <h4 style={{ fontSize: '1.05rem', color: 'var(--color-charcoal)', marginBottom: '4px' }}>Office Address</h4>
                     <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                      3WVQ+WCV, Mettupalayam Main Road, Kothari Nagar, Sri Lakshmi Nagar, Thoppampatti Pirivu, K. Vadamadurai, Coimbatore, Tamil Nadu 641017, India.
+                      CV Towers, 3WVQ+WCV, Mettupalayam Main Road, Kothari Nagar, Sri Lakshmi Nagar, Thoppampatti Pirivu, K. Vadamadurai, Coimbatore, Tamil Nadu 641017, India.
                     </p>
-                    <a
-                      href="https://maps.app.goo.gl/dygytaly"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-deep-plum)', marginTop: '8px' }}
-                    >
-                      Open in Google Maps <ExternalLink size={12} />
-                    </a>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginTop: '8px', flexWrap: 'wrap' }}>
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&query=DYGYTALY,+CV+Towers,+Thoppampatti+Pirivu,+Coimbatore+641017"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-deep-plum)' }}
+                      >
+                        Open in Google Maps <ExternalLink size={12} />
+                      </a>
+                      <span style={{ color: 'var(--text-muted)' }}>•</span>
+                      <a
+                        href="https://share.google/0uskTCwteOiHO7Y1Y"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', fontWeight: 600, color: 'var(--color-tangerine)' }}
+                      >
+                        Verified Google Profile <ExternalLink size={12} />
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -138,7 +149,35 @@ export const ContactPage: React.FC = () => {
           </div>
 
           {/* Google Maps Embed */}
-          <div style={{ marginTop: '70px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)' }}>
+          <div style={{ marginTop: '70px', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-md)', background: '#fff' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <MapPin size={18} style={{ color: 'var(--color-tangerine)' }} />
+                <span style={{ fontWeight: 600, color: 'var(--color-charcoal)', fontSize: '0.95rem' }}>
+                  DYGYTALY • CV Towers, Thoppampatti Pirivu, Coimbatore
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <a
+                  href="https://share.google/0uskTCwteOiHO7Y1Y"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  style={{ fontSize: '0.8rem', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--color-deep-plum)' }}
+                >
+                  Google Profile & Reviews <ExternalLink size={13} />
+                </a>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=DYGYTALY,+CV+Towers,+Thoppampatti+Pirivu,+Coimbatore+641017"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline btn-sm"
+                  style={{ fontSize: '0.8rem', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  Open in Google Maps <ExternalLink size={13} />
+                </a>
+              </div>
+            </div>
             <iframe
               title="Dygytaly Office Location on Google Maps"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3915.228741364583!2d76.93976377583626!3d11.082531353199853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba8f7105dc7984f%3A0xe5a28c2e6fca783f!2sDygytaly!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"

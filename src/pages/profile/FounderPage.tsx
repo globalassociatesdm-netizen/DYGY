@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
   ArrowRight,
   Coffee,
-  RotateCcw,
-  Compass,
-  ArrowUp,
-  Heart,
   Quote,
   Target,
   Briefcase,
-  ExternalLink,
-  ChevronRight
+  Compass,
+  ArrowDown,
+  Play,
+  Pause,
+  RotateCcw
 } from 'lucide-react';
 import { Linkedin, Instagram } from '../../components/SocialIcons';
-import { Founder3DCanvas } from '../../components/founder/Founder3DCanvas';
 import { CoffeeCatchUpForm } from '../../components/CoffeeCatchUpForm';
-import { SmokeCard } from '@/components/ui/smoke-card';
 
 interface StoryChapter {
   id: string;
@@ -29,6 +26,17 @@ interface StoryChapter {
   clientConnection: string;
   animationTitle: string;
 }
+
+const TOTAL_FRAMES = 300;
+const PRIMARY_PATH = '/founder-frames/ezgif-frame-';
+const FALLBACK_PATH = '/ezgif-45d741942d5b1211-jpg/ezgif-frame-';
+const STATIC_FALLBACK_PORTRAIT = '/uploads/founder-profile.jpg';
+
+const getFrameUrl = (frameIndex: number, useFallback = false): string => {
+  const clamped = Math.min(TOTAL_FRAMES, Math.max(1, Math.round(frameIndex)));
+  const padded = String(clamped).padStart(3, '0');
+  return `${useFallback ? FALLBACK_PATH : PRIMARY_PATH}${padded}.jpg`;
+};
 
 const STORY_CHAPTERS: StoryChapter[] = [
   {
@@ -123,375 +131,594 @@ const STORY_CHAPTERS: StoryChapter[] = [
 
 export const FounderPage: React.FC = () => {
   const [activeChapter, setActiveChapter] = useState<number>(0);
-  const [chapterProgress, setChapterProgress] = useState<number>(0);
-  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const [isInitialReady, setIsInitialReady] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [loadedCount, setLoadedCount] = useState<number>(0);
   const [showCoffeeModal, setShowCoffeeModal] = useState<boolean>(false);
-  const storyContainerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll Synchronization & Active Chapter Detection
+  const experienceRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const threadFillRef = useRef<HTMLDivElement | null>(null);
+  const frameCounterRef = useRef<HTMLSpanElement | null>(null);
+
+  // 300 Image Frames Cache
+  const imagesRef = useRef<(HTMLImageElement | null)[]>(new Array(TOTAL_FRAMES + 1).fill(null));
+  const loadedFlagsRef = useRef<boolean[]>(new Array(TOTAL_FRAMES + 1).fill(false));
+  const fallbackImgRef = useRef<HTMLImageElement | null>(null);
+
+  const currentFrameRef = useRef<number>(1);
+  const targetFrameRef = useRef<number>(1);
+  const activeChapterRef = useRef<number>(0);
+  const animFrameIdRef = useRef<number | null>(null);
+  const isUserScrollingRef = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
+
+  // Load static fallback portrait as insurance
   useEffect(() => {
-    const handleScroll = () => {
-      const storyEl = storyContainerRef.current;
-      if (!storyEl) return;
+    const portrait = new Image();
+    portrait.onload = () => {
+      fallbackImgRef.current = portrait;
+      if (!loadedFlagsRef.current[1]) {
+        drawFrame(1);
+      }
+    };
+    portrait.src = STATIC_FALLBACK_PORTRAIT;
+  }, []);
 
-      const rect = storyEl.getBoundingClientRect();
-      const totalHeight = storyEl.offsetHeight - window.innerHeight;
-      const scrolled = -rect.top;
-      const globalPercent = Math.min(Math.max(scrolled / (totalHeight || 1), 0), 1);
-      setScrollProgress(globalPercent);
+  // Helper to retrieve nearest loaded frame
+  const getNearestLoadedFrame = (target: number): HTMLImageElement | null => {
+    const clamped = Math.min(TOTAL_FRAMES, Math.max(1, Math.round(target)));
+    if (loadedFlagsRef.current[clamped] && imagesRef.current[clamped]?.naturalWidth) {
+      return imagesRef.current[clamped];
+    }
+    // Search outward for nearest buffered frame
+    for (let offset = 1; offset < 45; offset++) {
+      const prev = clamped - offset;
+      if (prev >= 1 && loadedFlagsRef.current[prev] && imagesRef.current[prev]?.naturalWidth) {
+        return imagesRef.current[prev];
+      }
+      const next = clamped + offset;
+      if (next <= TOTAL_FRAMES && loadedFlagsRef.current[next] && imagesRef.current[next]?.naturalWidth) {
+        return imagesRef.current[next];
+      }
+    }
+    // Search any loaded frame
+    for (let i = 1; i <= TOTAL_FRAMES; i++) {
+      if (loadedFlagsRef.current[i] && imagesRef.current[i]?.naturalWidth) {
+        return imagesRef.current[i];
+      }
+    }
+    return fallbackImgRef.current;
+  };
 
-      // Check which chapter section is closest to viewport center
-      const chapterEls = STORY_CHAPTERS.map(ch => document.getElementById(ch.id));
-      const viewportCenter = window.innerHeight * 0.42;
+  // High-DPI Canvas Rendering
+  const drawFrame = useCallback((frameNum: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      let closestIdx = 0;
-      let minDistance = Infinity;
+    const img = getNearestLoadedFrame(frameNum);
+    if (!img || !img.complete || img.naturalWidth === 0) return;
 
-      chapterEls.forEach((el, idx) => {
-        if (!el) return;
-        const cRect = el.getBoundingClientRect();
-        const dist = Math.abs(cRect.top - viewportCenter);
-        if (dist < minDistance) {
-          minDistance = dist;
-          closestIdx = idx;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const fallbackW = canvas.parentElement?.clientWidth || window.innerWidth * 0.5;
+    const fallbackH = canvas.parentElement?.clientHeight || window.innerHeight;
+    const targetW = Math.round((rect.width > 10 ? rect.width : fallbackW) * dpr);
+    const targetH = Math.round((rect.height > 10 ? rect.height : fallbackH) * dpr);
+
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
+
+    try {
+      ctx.save();
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Cover math: preserve natural proportions without distortion
+      const imgRatio = img.naturalWidth / img.naturalHeight;
+      const canvasRatio = canvas.width / canvas.height;
+
+      let renderW = canvas.width;
+      let renderH = canvas.height;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (canvasRatio > imgRatio) {
+        renderW = canvas.width;
+        renderH = canvas.width / imgRatio;
+        offsetY = (canvas.height - renderH) / 2;
+      } else {
+        renderH = canvas.height;
+        renderW = canvas.height * imgRatio;
+        offsetX = (canvas.width - renderW) / 2;
+      }
+
+      ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
+
+      // Luxury right edge blend: dissolves image into dark background (#140916)
+      const rightEdge = ctx.createLinearGradient(canvas.width * 0.72, 0, canvas.width, 0);
+      rightEdge.addColorStop(0, 'rgba(20, 9, 22, 0)');
+      rightEdge.addColorStop(0.55, 'rgba(20, 9, 22, 0.45)');
+      rightEdge.addColorStop(1, 'rgba(20, 9, 22, 0.98)');
+      ctx.fillStyle = rightEdge;
+      ctx.fillRect(canvas.width * 0.7, 0, canvas.width * 0.3, canvas.height);
+
+      // Top and bottom cinematic vignette
+      const vertVignette = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      vertVignette.addColorStop(0, 'rgba(20, 9, 22, 0.65)');
+      vertVignette.addColorStop(0.12, 'rgba(20, 9, 22, 0)');
+      vertVignette.addColorStop(0.85, 'rgba(20, 9, 22, 0.15)');
+      vertVignette.addColorStop(1, 'rgba(20, 9, 22, 0.92)');
+      ctx.fillStyle = vertVignette;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.restore();
+    } catch (err) {
+      // Safe boundary
+    }
+  }, []);
+
+  // Frame preloader pipeline
+  useEffect(() => {
+    let isCancelled = false;
+    let loadedCountLocal = 0;
+
+    const loadSingle = (index: number): Promise<void> => {
+      return new Promise((resolve) => {
+        if (loadedFlagsRef.current[index]) {
+          resolve();
+          return;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+          if (isCancelled) return;
+          imagesRef.current[index] = img;
+          loadedFlagsRef.current[index] = true;
+          loadedCountLocal++;
+          if (loadedCountLocal % 10 === 0 || loadedCountLocal === TOTAL_FRAMES) {
+            setLoadedCount(loadedCountLocal);
+          }
+
+          if (index === 1 || !isInitialReady) {
+            setIsInitialReady(true);
+            drawFrame(index);
+          }
+          resolve();
+        };
+
+        img.onerror = () => {
+          // Attempt fallback path
+          const fallback = new Image();
+          fallback.onload = () => {
+            if (isCancelled) return;
+            imagesRef.current[index] = fallback;
+            loadedFlagsRef.current[index] = true;
+            loadedCountLocal++;
+            if (index === 1 || !isInitialReady) {
+              setIsInitialReady(true);
+              drawFrame(index);
+            }
+            resolve();
+          };
+          fallback.onerror = () => {
+            resolve(); // do not block pipeline
+          };
+          fallback.src = getFrameUrl(index, true);
+        };
+
+        img.src = getFrameUrl(index, false);
+
+        // If already cached and complete
+        if (img.complete && img.naturalWidth > 0) {
+          imagesRef.current[index] = img;
+          loadedFlagsRef.current[index] = true;
+          loadedCountLocal++;
+          if (index === 1) {
+            setIsInitialReady(true);
+            drawFrame(1);
+          }
+          resolve();
         }
       });
+    };
 
-      setActiveChapter(closestIdx);
+    // Priority 1: Load critical milestone keyframes first
+    const criticalIndices = [
+      1, 10, 25, 40, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300
+    ];
 
-      // Chapter-specific progress calculation
-      const currentEl = chapterEls[closestIdx];
-      if (currentEl) {
-        const cRect = currentEl.getBoundingClientRect();
-        const chProg = Math.min(Math.max((viewportCenter - cRect.top) / cRect.height, 0), 1);
-        setChapterProgress(chProg);
+    Promise.all(criticalIndices.map(loadSingle)).then(() => {
+      if (isCancelled) return;
+      setIsInitialReady(true);
+      drawFrame(currentFrameRef.current);
+
+      // Priority 2: Stagger remaining frames in background chunks of 15
+      let cur = 1;
+      const loadNextChunk = () => {
+        if (isCancelled || cur > TOTAL_FRAMES) return;
+        const chunk: Promise<void>[] = [];
+        for (let b = 0; b < 15 && cur <= TOTAL_FRAMES; b++, cur++) {
+          if (!loadedFlagsRef.current[cur]) {
+            chunk.push(loadSingle(cur));
+          }
+        }
+        Promise.all(chunk).then(() => {
+          if (!isCancelled && cur <= TOTAL_FRAMES) {
+            setTimeout(loadNextChunk, 20);
+          }
+        });
+      };
+      loadNextChunk();
+    });
+
+    // Safety timeout: ensure loader clears after 600ms even on slow networks
+    const readyTimer = setTimeout(() => {
+      if (!isCancelled) {
+        setIsInitialReady(true);
+        drawFrame(1);
+      }
+    }, 600);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(readyTimer);
+    };
+  }, [drawFrame]);
+
+  // Main 25FPS Continuous Reel & Smooth Scrub Loop
+  useEffect(() => {
+    let isRunning = true;
+    let lastTime = performance.now();
+    const fps = 25;
+    const interval = 1000 / fps;
+
+    const animLoop = (now: number) => {
+      if (!isRunning) return;
+
+      const delta = now - lastTime;
+
+      if (isPlaying && !isUserScrollingRef.current) {
+        // Continuous auto-play reel
+        if (delta >= interval) {
+          lastTime = now - (delta % interval);
+          targetFrameRef.current = (targetFrameRef.current % TOTAL_FRAMES) + 1;
+          currentFrameRef.current = targetFrameRef.current;
+          drawFrame(currentFrameRef.current);
+
+          // Update active chapter ONLY when chapter index changes
+          const chIdx = Math.min(
+            STORY_CHAPTERS.length - 1,
+            Math.floor(((targetFrameRef.current - 1) / TOTAL_FRAMES) * STORY_CHAPTERS.length)
+          );
+          if (chIdx !== activeChapterRef.current) {
+            activeChapterRef.current = chIdx;
+            setActiveChapter(chIdx);
+          }
+
+          // Direct DOM updates for ultra-smooth UI without React re-render thrashing
+          const pct = Math.round(((targetFrameRef.current - 1) / (TOTAL_FRAMES - 1)) * 100);
+          if (threadFillRef.current) {
+            threadFillRef.current.style.height = `${pct}%`;
+          }
+          if (frameCounterRef.current) {
+            frameCounterRef.current.textContent = `FRM ${String(Math.round(currentFrameRef.current)).padStart(3, '0')}`;
+          }
+        }
+      } else {
+        // Smooth scroll interpolation (scrubbing)
+        const diff = targetFrameRef.current - currentFrameRef.current;
+        if (Math.abs(diff) > 0.05) {
+          currentFrameRef.current += diff * 0.24;
+          drawFrame(currentFrameRef.current);
+          if (frameCounterRef.current) {
+            frameCounterRef.current.textContent = `FRM ${String(Math.round(currentFrameRef.current)).padStart(3, '0')}`;
+          }
+        } else if (Math.abs(diff) > 0) {
+          currentFrameRef.current = targetFrameRef.current;
+          drawFrame(currentFrameRef.current);
+          if (frameCounterRef.current) {
+            frameCounterRef.current.textContent = `FRM ${String(Math.round(currentFrameRef.current)).padStart(3, '0')}`;
+          }
+        }
+      }
+
+      animFrameIdRef.current = requestAnimationFrame(animLoop);
+    };
+
+    animFrameIdRef.current = requestAnimationFrame(animLoop);
+
+    return () => {
+      isRunning = false;
+      if (animFrameIdRef.current) cancelAnimationFrame(animFrameIdRef.current);
+    };
+  }, [isPlaying, drawFrame]);
+
+  // Scroll Synchronization Handler
+  useEffect(() => {
+    const handleScroll = () => {
+      isUserScrollingRef.current = true;
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      // Resume autoplay 1.2s after user stops scrolling
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isUserScrollingRef.current = false;
+      }, 1200);
+
+      const container = experienceRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const totalDist = container.offsetHeight - window.innerHeight;
+      if (totalDist <= 0) return;
+
+      const scrolled = Math.max(0, -rect.top);
+      const prog = Math.min(1, Math.max(0, scrolled / totalDist));
+      const targetFrame = Math.min(TOTAL_FRAMES, Math.max(1, Math.round(1 + prog * (TOTAL_FRAMES - 1))));
+
+      targetFrameRef.current = targetFrame;
+
+      if (threadFillRef.current) {
+        threadFillRef.current.style.height = `${Math.round(prog * 100)}%`;
+      }
+
+      const chapterIdx = Math.min(
+        STORY_CHAPTERS.length - 1,
+        Math.floor(prog * STORY_CHAPTERS.length)
+      );
+      if (chapterIdx !== activeChapterRef.current) {
+        activeChapterRef.current = chapterIdx;
+        setActiveChapter(chapterIdx);
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    window.addEventListener('resize', () => drawFrame(currentFrameRef.current));
 
-  const scrollToChapter = (index: number) => {
-    const el = document.getElementById(`chapter-${index}`);
-    if (el) {
-      const targetPos = el.offsetTop - 140;
-      window.scrollTo({
-        top: targetPos,
-        behavior: 'smooth'
-      });
-      setActiveChapter(index);
-    }
-  };
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, [drawFrame]);
 
-  const handleReplayChapter = (index: number) => {
-    scrollToChapter(index);
-  };
-
-  const handleExploreStory = () => {
-    scrollToChapter(0);
-  };
-
-  const handleBackToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
+  const currentChapter = STORY_CHAPTERS[activeChapter] || STORY_CHAPTERS[0];
 
   return (
-    <div className="storytelling-page">
-      {/* Editorial Header Hero with Interactive Smoke Effect */}
-      <section className="storytelling-hero" style={{ position: 'relative' }}>
-        {/* Interactive Ethereal Smoke Effect Canvas Layer */}
-        <SmokeCard
-          className="absolute inset-0 w-full h-full bg-transparent border-0 rounded-none pointer-events-auto"
-          smokeColor="#F18A55"
-          listenToWindow={true}
-        />
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '6px 18px',
-              borderRadius: '9999px',
-              background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.18)',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'var(--color-tangerine)',
-              marginBottom: '24px'
-            }}
-          >
-            <Sparkles size={14} />
-            DYGYTALY FOUNDER PROFILE • INTERACTIVE STORYBOOK
+    <div className="founder-story-page">
+      {/* Main 50/50 Continuous Storytelling Container */}
+      <div className="founder-story-container founder-experience-container" ref={experienceRef}>
+        
+        {/* LEFT COLUMN: Sticky Founder Story Visual Narrative */}
+        <div className="founder-visual-column" aria-label="Founder Story Visual Narrative">
+          {/* Slender vertical progress thread */}
+          <div className="founder-scroll-thread">
+            <div
+              ref={threadFillRef}
+              className="founder-scroll-thread-fill"
+              style={{ height: '0%' }}
+            />
           </div>
 
-          <h1 className="storytelling-hero-title">
-            “A Girl With Dreams Too Big to Stay Dreams.”
-          </h1>
+          {/* Minimal Documentary HUD Overlay: Top */}
+          <div className="founder-visual-hud-top">
+            <div className="founder-hud-dot" />
+            <span className="founder-hud-title">
+              CHAPTER {currentChapter.num} / 06 • {currentChapter.animationTitle}
+            </span>
+          </div>
 
-          <p className="storytelling-hero-subtitle">
-            The interactive journey of <strong>Gowri Jagadheeshwaran</strong> — building Dygytaly Digital Marketing Agency from a solitary desk into a 50-seater private limited agency in Coimbatore.
-          </p>
+          {/* Canvas Rendering Area */}
+          <canvas ref={canvasRef} className="founder-story-canvas" />
 
-          {/* Quick Founder Badge Card */}
+          {/* Initial Loading State: Soft transparent spinner that never blocks view */}
+          {!isInitialReady && (
+            <div className="founder-canvas-loader">
+              <div
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: '3px solid rgba(241, 138, 85, 0.25)',
+                  borderTopColor: '#F18A55',
+                  animation: 'spin 0.8s linear infinite'
+                }}
+              />
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#FFFFFF' }}>
+                Preparing Founder Odyssey...
+              </span>
+            </div>
+          )}
+
+          {/* Interactive Play/Pause & Frame Counter Pill in HUD */}
           <div
             style={{
-              display: 'inline-flex',
+              position: 'absolute',
+              top: '24px',
+              right: '24px',
+              zIndex: 25,
+              display: 'flex',
               alignItems: 'center',
-              gap: '20px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              backdropFilter: 'blur(12px)',
-              padding: '12px 24px',
-              borderRadius: '9999px',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              marginBottom: '32px'
+              gap: '8px'
             }}
           >
-            <img
-              src="/uploads/founder-profile.jpg"
-              alt="Gowri Jagadheeshwaran"
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
               style={{
-                width: '46px',
-                height: '52px',
-                borderRadius: '50% / 54%',
-                objectFit: 'cover',
-                border: '2px solid var(--color-tangerine)'
+                background: 'rgba(20, 9, 22, 0.75)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(241, 138, 85, 0.4)',
+                borderRadius: '9999px',
+                padding: '6px 14px',
+                color: '#FFFFFF',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4)'
               }}
-            />
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '0.98rem', fontWeight: 700, color: '#fff' }}>Gowri Jagadheeshwaran</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--color-tangerine)', fontWeight: 600 }}>Founder & Managing Director</div>
+              title={isPlaying ? 'Pause Animation' : 'Play Animation'}
+            >
+              {isPlaying ? <Pause size={12} color="#F18A55" /> : <Play size={12} fill="#F18A55" color="#F18A55" />}
+              <span>{isPlaying ? 'Playing' : 'Paused'}</span>
+            </button>
+
+            <div
+              style={{
+                background: 'rgba(20, 9, 22, 0.75)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '9999px',
+                padding: '6px 12px',
+                color: '#FFFFFF',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                letterSpacing: '0.04em'
+              }}
+            >
+              <span ref={frameCounterRef} style={{ color: '#F18A55' }}>FRM 001</span>
+              <span style={{ opacity: 0.5 }}>/300</span>
             </div>
-            <div style={{ display: 'flex', gap: '8px', marginLeft: '10px' }}>
+          </div>
+
+          {/* Minimal Documentary HUD Overlay: Bottom */}
+          <div className="founder-visual-hud-bottom">
+            <div className="founder-hud-name">Gowri Jagadheeshwaran</div>
+            <div className="founder-hud-role">Founder & Managing Director, Dygytaly Agency</div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: Full-Page Vertically Scrolling Narrative */}
+        <div className="founder-narrative-column">
+          
+          {/* Editorial Opening Header Block */}
+          <header className="founder-narrative-header">
+            <h1 className="founder-lead-title">
+              “A Girl With Dreams Too Big to Stay Dreams.”
+            </h1>
+
+            <p className="founder-lead-desc">
+              The continuous interactive journey of <strong>Gowri Jagadheeshwaran</strong> — building Dygytaly Digital Marketing Agency from a solitary desk into a 50-seater private limited agency in Coimbatore.
+            </p>
+
+            {/* Quick credentials */}
+            <div className="founder-meta-tags-row">
+              <span className="founder-meta-chip">50-Seater Agency HQ</span>
+              <span className="founder-meta-chip">Coimbatore, Tamil Nadu</span>
+              <span className="founder-meta-chip">First-Gen Founder</span>
+            </div>
+
+            {/* LinkedIn & Instagram on the same line */}
+            <div className="founder-social-row">
               <a
                 href="https://www.linkedin.com/company/dygytaly/"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                style={{ color: '#fff', opacity: 0.85, padding: '4px' }}
+                aria-label="Founder LinkedIn"
+                className="founder-social-pill"
               >
-                <Linkedin size={17} />
+                <Linkedin size={16} />
+                <span>LinkedIn</span>
               </a>
               <a
                 href="https://www.instagram.com/dygytaly_official/?hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
-                style={{ color: '#fff', opacity: 0.85, padding: '4px' }}
+                aria-label="Dygytaly Instagram"
+                className="founder-social-pill"
               >
-                <Instagram size={17} />
+                <Instagram size={16} />
+                <span>Instagram</span>
               </a>
             </div>
-          </div>
+          </header>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
-            <button onClick={handleExploreStory} className="btn btn-primary btn-lg">
-              <Compass size={18} /> Explore My Story ↓
-            </button>
-            <button
-              onClick={() => setShowCoffeeModal(true)}
-              className="btn btn-outline btn-lg"
-              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
-            >
-              <Coffee size={18} /> Catch Up Over Coffee ☕
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Sticky Chapter Navigation Bar */}
-      <div className="chapter-nav-sticky">
-        <div className="chapter-progress-line" style={{ width: `${Math.round(scrollProgress * 100)}%` }} />
-        <div className="container">
-          <div className="chapter-pills-bar">
-            {STORY_CHAPTERS.map((ch, idx) => (
-              <button
-                key={ch.id}
-                onClick={() => scrollToChapter(idx)}
-                className={`chapter-pill-btn ${activeChapter === idx ? 'active' : ''}`}
-                title={`Jump to ${ch.category}`}
+          {/* The 6 Story Chapters */}
+          {STORY_CHAPTERS.map((chapter, idx) => {
+            const isActive = activeChapter === idx;
+            return (
+              <section
+                key={chapter.id}
+                id={chapter.id}
+                className={`founder-chapter-block ${isActive ? 'is-active' : ''}`}
               >
-                <span className="pill-number">{ch.num}</span>
-                <span>{ch.animationTitle}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+                {/* Chapter Eyebrow Tag */}
+                <div className="chapter-badge-tag">
+                  <div className="chapter-number-circle">{chapter.num}</div>
+                  <span>CHAPTER {chapter.num} — {chapter.category}</span>
+                </div>
 
-      {/* 50/50 Desktop Storytelling Split Section */}
-      <div className="container" ref={storyContainerRef}>
-        <div className="storytelling-split">
-          {/* LEFT HALF: THE 6 CHAPTERS */}
-          <div className="story-left-col">
-            {STORY_CHAPTERS.map((chapter, idx) => {
-              const isActive = activeChapter === idx;
-              return (
-                <article
-                  key={chapter.id}
-                  id={chapter.id}
-                  className="chapter-section"
+                {/* Editorial Headline */}
+                <h2 className="chapter-editorial-headline">{chapter.headline}</h2>
+
+                {/* Narrative Paragraphs */}
+                <div className="chapter-body-paragraphs">
+                  {chapter.paragraphs.map((para, pIdx) => (
+                    <p key={pIdx}>{para}</p>
+                  ))}
+                </div>
+
+                {/* Highlight Quote */}
+                <div className="chapter-pull-quote-box">
+                  <Quote
+                    size={24}
+                    style={{
+                      color: 'var(--color-tangerine)',
+                      marginBottom: '10px',
+                      opacity: 0.95
+                    }}
+                  />
+                  <p>“{chapter.highlightQuote}”</p>
+                </div>
+
+                {/* Client Connection */}
+                <div className="chapter-for-you-card">
+                  <span className="chapter-for-you-badge">FOR YOU</span>
+                  <p className="chapter-for-you-text">{chapter.clientConnection}</p>
+                </div>
+              </section>
+            );
+          })}
+
+          {/* Final Chapter Climax & Invitation */}
+          <section className="founder-story-climax">
+            <div className="founder-climax-card">
+              <h2>Welcome to Dygytaly.</h2>
+              <p>
+                Let's build something beautiful. Let's grow together. Tell me what you're building, where you want to go, and what growth means to you. Let's explore the possibilities together.
+              </p>
+
+              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <Link
+                  to="/contact"
+                  className="btn btn-primary btn-lg"
                   style={{
-                    opacity: isActive ? 1 : 0.72,
-                    transform: isActive ? 'scale(1)' : 'scale(0.985)',
-                    transition: 'all 0.35s ease'
+                    padding: '16px 36px',
+                    fontSize: '1.05rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.04em'
                   }}
                 >
-                  <div className={`chapter-card-box ${isActive ? 'active-card' : ''}`}>
-                    {/* Chapter Metadata Tag */}
-                    <div className="chapter-meta-tag">
-                      <span
-                        style={{
-                          width: '7px',
-                          height: '7px',
-                          borderRadius: '50%',
-                          background: 'var(--color-tangerine)'
-                        }}
-                      />
-                      CHAPTER {chapter.num} — {chapter.category}
-                    </div>
+                  LET'S GROW TOGETHER →
+                </Link>
 
-                    {/* Editorial Headline */}
-                    <h2 className="chapter-headline">{chapter.headline}</h2>
+                <button
+                  onClick={() => setShowCoffeeModal(true)}
+                  className="btn btn-outline btn-lg"
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.4)', color: '#FFFFFF' }}
+                >
+                  <Coffee size={18} /> Catch Up Over Coffee ☕
+                </button>
+              </div>
+            </div>
+          </section>
 
-                    {/* Emotional Narrative Paragraphs */}
-                    <div className="chapter-paragraphs">
-                      {chapter.paragraphs.map((p, pIdx) => (
-                        <p key={pIdx}>{p}</p>
-                      ))}
-                    </div>
-
-                    {/* Memorable Highlighted Sentence Quote */}
-                    <div className="chapter-highlight-quote">
-                      <Quote
-                        size={22}
-                        style={{
-                          color: 'var(--color-tangerine)',
-                          marginBottom: '8px',
-                          opacity: 0.9
-                        }}
-                      />
-                      <p>“{chapter.highlightQuote}”</p>
-                    </div>
-
-                    {/* "What This Means For You" Client Connection */}
-                    <div className="chapter-client-connection">
-                      <span className="chapter-client-badge">FOR YOU</span>
-                      <p className="chapter-client-text">{chapter.clientConnection}</p>
-                    </div>
-
-                    {/* Chapter Action Controls */}
-                    <div className="chapter-action-bar">
-                      <button
-                        onClick={() => handleReplayChapter(idx)}
-                        className="btn-replay-chapter"
-                        title="Replay visual 3D animation for this chapter"
-                      >
-                        <RotateCcw size={14} /> Replay this chapter
-                      </button>
-
-                      {idx < STORY_CHAPTERS.length - 1 ? (
-                        <button
-                          onClick={() => scrollToChapter(idx + 1)}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--color-charcoal)',
-                            fontWeight: 600,
-                            fontSize: '0.86rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Next: {STORY_CHAPTERS[idx + 1].animationTitle} <ChevronRight size={16} />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handleBackToTop}
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--color-tangerine)',
-                            fontWeight: 700,
-                            fontSize: '0.86rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <ArrowUp size={15} /> Back to beginning
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Final Chapter 6 Climax Invitation & CTA */}
-                    {idx === 5 && (
-                      <div className="final-climax-box">
-                        <img
-                          src="/logo.png"
-                          alt="Dygytaly Logo"
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            objectFit: 'contain',
-                            margin: '0 auto 16px auto',
-                            filter: 'brightness(0) invert(1)'
-                          }}
-                        />
-                        <h3>Welcome to Dygytaly.</h3>
-                        <p>
-                          Let's build something beautiful. Let's grow together. Tell me what you're building, where you want to go, and what growth means to you. Let's explore the possibilities together.
-                        </p>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', alignItems: 'center' }}>
-                          <Link
-                            to="/contact"
-                            className="btn btn-primary btn-lg"
-                            style={{
-                              padding: '16px 36px',
-                              fontSize: '1.05rem',
-                              fontWeight: 700,
-                              letterSpacing: '0.04em'
-                            }}
-                          >
-                            LET'S GROW TOGETHER →
-                          </Link>
-
-                          <button
-                            onClick={() => setShowCoffeeModal(true)}
-                            className="btn btn-outline btn-sm"
-                            style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
-                          >
-                            <Coffee size={15} /> Catch Up Over Coffee ☕
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          {/* RIGHT HALF: PERSISTENT 3D ANIMATED FOUNDER JOURNEY */}
-          <aside className="story-right-col" aria-label="Interactive 3D Founder Character Scene">
-            <Founder3DCanvas
-              activeChapter={activeChapter}
-              chapterProgress={chapterProgress}
-              onChapterSelect={scrollToChapter}
-            />
-          </aside>
         </div>
       </div>
 
@@ -501,9 +728,9 @@ export const FounderPage: React.FC = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 1000,
-            background: 'rgba(41, 26, 45, 0.75)',
-            backdropFilter: 'blur(8px)',
+            zIndex: 2000,
+            background: 'rgba(20, 9, 22, 0.85)',
+            backdropFilter: 'blur(12px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -549,7 +776,9 @@ export const FounderPage: React.FC = () => {
             </button>
 
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <span className="eyebrow" style={{ color: 'var(--color-tangerine)' }}>DIRECT LEADERSHIP CONNECTION</span>
+              <span className="eyebrow" style={{ color: 'var(--color-tangerine)' }}>
+                DIRECT LEADERSHIP CONNECTION
+              </span>
               <h3 style={{ fontSize: '1.8rem', color: 'var(--color-charcoal)', marginTop: '6px' }}>
                 Let's Catch Up Over Coffee ☕
               </h3>
@@ -565,4 +794,5 @@ export const FounderPage: React.FC = () => {
     </div>
   );
 };
+
 export default FounderPage;

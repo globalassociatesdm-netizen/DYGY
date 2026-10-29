@@ -84,20 +84,25 @@ function onMousemove(e) {
       lines.push(new Line({ spring: 0.45 + (e / E.trails) * 0.025 }));
   }
   function c(e) {
-    e.touches
-      ? ((pos.x = e.touches[0].pageX), (pos.y = e.touches[0].pageY))
-      : ((pos.x = e.clientX), (pos.y = e.clientY)),
-      e.preventDefault();
+    if (e.touches) {
+      pos.x = e.touches[0].pageX;
+      pos.y = e.touches[0].pageY;
+    } else {
+      pos.x = e.clientX;
+      pos.y = e.clientY;
+    }
   }
   function l(e) {
-    1 == e.touches.length &&
-      ((pos.x = e.touches[0].pageX), (pos.y = e.touches[0].pageY));
+    if (e.touches && e.touches.length == 1) {
+      pos.x = e.touches[0].pageX;
+      pos.y = e.touches[0].pageY;
+    }
   }
   document.removeEventListener("mousemove", onMousemove);
   document.removeEventListener("touchstart", onMousemove);
-  document.addEventListener("mousemove", c);
-  document.addEventListener("touchmove", c);
-  document.addEventListener("touchstart", l);
+  document.addEventListener("mousemove", c, { passive: true });
+  document.addEventListener("touchmove", c, { passive: true });
+  document.addEventListener("touchstart", l, { passive: true });
   c(e);
   o();
   render();
@@ -123,7 +128,7 @@ function render() {
 
 function resizeCanvas() {
   if (ctx && ctx.canvas) {
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
   }
 }
@@ -131,7 +136,7 @@ function resizeCanvas() {
 var ctx,
   f,
   e = 0,
-  pos = {},
+  pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 },
   lines = [],
   E = {
     debug: true,
@@ -149,6 +154,15 @@ function Node() {
   this.vx = 0;
 }
 
+export const destroyCanvas = function () {
+  if (ctx) {
+    ctx.running = false;
+  }
+  document.removeEventListener("mousemove", onMousemove);
+  document.removeEventListener("touchstart", onMousemove);
+  window.removeEventListener("resize", resizeCanvas);
+};
+
 export const renderCanvas = function () {
   const canvasEl = document.getElementById("canvas");
   if (!canvasEl) return;
@@ -162,9 +176,8 @@ export const renderCanvas = function () {
     frequency: 0.0015,
     offset: 285,
   });
-  document.addEventListener("mousemove", onMousemove);
-  document.addEventListener("touchstart", onMousemove);
-  document.body.addEventListener("orientationchange", resizeCanvas);
+  document.addEventListener("mousemove", onMousemove, { passive: true });
+  document.addEventListener("touchstart", onMousemove, { passive: true });
   window.addEventListener("resize", resizeCanvas);
   window.addEventListener("focus", () => {
     if (ctx && !ctx.running) {

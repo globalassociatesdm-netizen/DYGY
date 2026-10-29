@@ -243,6 +243,19 @@ export const AdminSettingsTab: React.FC = () => {
             </div>
           </div>
 
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>
+              Google Business Profile URL (Public Share Link)
+            </label>
+            <input
+              type="url"
+              value={settings.google_business_url || 'https://share.google/0uskTCwteOiHO7Y1Y'}
+              onChange={(e) => handleChange('google_business_url', e.target.value)}
+              placeholder="https://share.google/..."
+              style={{ width: '100%', padding: '9px 12px', border: '1px solid #8c8f94', borderRadius: '4px', boxSizing: 'border-box' }}
+            />
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '6px' }}>

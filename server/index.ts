@@ -16,11 +16,13 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static uploads directory
-const uploadsDir = path.resolve(process.cwd(), 'public/uploads');
+// Static public & uploads directories
+const publicDir = path.resolve(process.cwd(), 'public');
+const uploadsDir = path.resolve(publicDir, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
+app.use(express.static(publicDir));
 app.use('/uploads', express.static(uploadsDir));
 
 // Multer storage for media and resumes

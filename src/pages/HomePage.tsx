@@ -5,10 +5,34 @@ import {
   Users, Database, TrendingUp, MapPin, Palette, Video, ChevronDown,
   Sparkles, Coffee, ExternalLink
 } from 'lucide-react';
-import { ThreeHeroCanvas } from '../components/ThreeHeroCanvas';
+import { DuckHeroCanvas } from '../components/DuckHeroCanvas';
 import { ThreeCoffeeCanvas } from '../components/ThreeCoffeeCanvas';
 import { CoffeeCatchUpForm } from '../components/CoffeeCatchUpForm';
 import { useScrollReveal, staggerDelay } from '../hooks/useScrollReveal';
+import { SERVICES_LIST } from '../data/servicesData';
+
+const CORE_PRINCIPLES = [
+  {
+    num: '01',
+    title: 'We Understand Before We Recommend.',
+    desc: 'No cookie-cutter templates or forced packages. We take the time to dissect your margins, sales cycles, and realistic commercial targets before suggesting a roadmap.'
+  },
+  {
+    num: '02',
+    title: 'Strategy Before Guesswork.',
+    desc: 'Every rupee invested in advertising, design, and software has a measurable intent. We establish transparent KPIs and clear conversion tracking upfront.'
+  },
+  {
+    num: '03',
+    title: 'Creativity With a Purpose.',
+    desc: 'Aesthetic elegance designed to do more than win compliments. We engineer visual identities and video narratives that capture attention, build trust, and drive conversions.'
+  },
+  {
+    num: '04',
+    title: 'Relationships Beyond Projects.',
+    desc: 'We are in this for the long haul. We celebrate your wins, stand beside you through market shifts, and continually optimize to compound your brand equity.'
+  }
+];
 
 const DEFAULT_SERVICES = [
   { slug: 'google-ads', title: 'Google Ads', tagline: 'Be There When Customers Are Searching.', short_desc: 'Reach high-intent audiences actively searching for your products and services with high-converting Search, Performance Max, Display, and Remarketing campaigns.', icon_name: 'Search' },
@@ -90,7 +114,7 @@ const DEFAULT_TESTIMONIALS = [
     rating: 5.0,
     review_text: 'Dygytaly completely transformed our digital strategy. They took the time to understand our textile machinery sales cycle and built a Google Ads campaign that delivered high-value commercial leads right from month one.',
     source: 'Google Review',
-    source_url: 'https://maps.app.goo.gl/dygytaly',
+    source_url: 'https://share.google/0uskTCwteOiHO7Y1Y',
     is_verified: 1
   },
   {
@@ -100,7 +124,7 @@ const DEFAULT_TESTIMONIALS = [
     rating: 5.0,
     review_text: 'The best digital agency in Coimbatore by far. They designed a gorgeous website that truly represents our design standards, and their local SEO work helped us secure major commercial interior contracts.',
     source: 'Google Review',
-    source_url: 'https://maps.app.goo.gl/dygytaly',
+    source_url: 'https://share.google/0uskTCwteOiHO7Y1Y',
     is_verified: 1
   },
   {
@@ -110,7 +134,7 @@ const DEFAULT_TESTIMONIALS = [
     rating: 5.0,
     review_text: 'Honest conversations, transparent metrics, and zero false promises. Gowri and her team treat our marketing budget with genuine accountability. Highly recommended for any serious business owner.',
     source: 'Google Review',
-    source_url: 'https://maps.app.goo.gl/dygytaly',
+    source_url: 'https://share.google/0uskTCwteOiHO7Y1Y',
     is_verified: 1
   }
 ];
@@ -152,7 +176,7 @@ const DEFAULT_FOUNDER_HOME = {
 
 export const HomePage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
-  const [services, setServices] = useState<any[]>(DEFAULT_SERVICES);
+  const [services, setServices] = useState<any[]>(SERVICES_LIST);
   const [portfolio, setPortfolio] = useState<any[]>(DEFAULT_PORTFOLIO);
   const [founder, setFounder] = useState<any>(DEFAULT_FOUNDER_HOME);
   const [testimonials, setTestimonials] = useState<any[]>(DEFAULT_TESTIMONIALS);
@@ -210,34 +234,39 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="homepage" ref={scrollRef}>
-      {/* SECTION A: Cinematic 3D Hero */}
+      {/* SECTION A: Interactive Mascot Hero Banner */}
       <section className="hero-section">
-        <ThreeHeroCanvas />
         <div className="container" style={{ position: 'relative', zIndex: 10 }}>
-          <div className="hero-content">
-            <div className="hero-eyebrow">
-              <Sparkles size={14} /> Dygytaly Digital Marketing & Technology
+          <div className="hero-grid-layout">
+            <div className="hero-content">
+              <div className="hero-eyebrow">
+                <Sparkles size={14} /> Dygytaly Digital Marketing & Technology
+              </div>
+              <h1 className="hero-headline">
+                Good Ideas Deserve Great Execution.
+              </h1>
+              <p className="hero-supporting">
+                Your Next Big Business Move Starts Here.
+              </p>
+              <p className="hero-description">
+                You bring the ambition. We'll bring the digital thinking. From making your brand stand out to building the technology that runs your business, Dygytaly brings marketing, creativity and technology together to help you move forward. Whether you're looking for better leads, a stronger online presence, a memorable brand or smarter business systems, let's find the right next step together.
+              </p>
+              <div className="hero-actions">
+                <Link to="/contact" className="btn btn-primary btn-lg">
+                  <Coffee size={20} /> Let's Catch Up ☕
+                </Link>
+                <Link to="/services" className="btn btn-outline-white btn-lg">
+                  Explore What We Do <ArrowRight size={18} />
+                </Link>
+              </div>
+              <div className="hero-scroll-indicator">
+                <div className="scroll-line" />
+                <span>Scroll down to explore</span>
+              </div>
             </div>
-            <h1 className="hero-headline">
-              Good Ideas Deserve Great Execution.
-            </h1>
-            <p className="hero-supporting">
-              Your Next Big Business Move Starts Here.
-            </p>
-            <p className="hero-description">
-              You bring the ambition. We'll bring the digital thinking. From making your brand stand out to building the technology that runs your business, Dygytaly brings marketing, creativity and technology together to help you move forward. Whether you're looking for better leads, a stronger online presence, a memorable brand or smarter business systems, let's find the right next step together.
-            </p>
-            <div className="hero-actions">
-              <Link to="/contact" className="btn btn-primary btn-lg">
-                <Coffee size={20} /> Let's Catch Up ☕
-              </Link>
-              <Link to="/services" className="btn btn-outline-white btn-lg">
-                Explore What We Do <ArrowRight size={18} />
-              </Link>
-            </div>
-            <div className="hero-scroll-indicator">
-              <div className="scroll-line" />
-              <span>Scroll down to explore</span>
+
+            <div className="hero-mascot-column">
+              <DuckHeroCanvas />
             </div>
           </div>
         </div>
@@ -251,14 +280,34 @@ export const HomePage: React.FC = () => {
             <h2 style={{ fontSize: '1.8rem', color: 'var(--color-charcoal)' }}>Real People. Real Conversations. Real Reviews.</h2>
           </div>
           <div className="trust-grid">
-            <div className="trust-item" data-reveal style={staggerDelay(0)}>
+            <a
+              href="https://share.google/0uskTCwteOiHO7Y1Y"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="trust-item"
+              data-reveal
+              style={{ ...staggerDelay(0), textDecoration: 'none', color: 'inherit', display: 'block', cursor: 'pointer' }}
+              title="View Dygytaly Verified Google Profile & Rating"
+            >
               <div className="trust-number">4.9 ★</div>
-              <div className="trust-label">Verified Google Business Rating</div>
-            </div>
-            <div className="trust-item" data-reveal style={staggerDelay(1)}>
+              <div className="trust-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                Verified Google Business Rating <ExternalLink size={12} />
+              </div>
+            </a>
+            <a
+              href="https://share.google/0uskTCwteOiHO7Y1Y"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="trust-item"
+              data-reveal
+              style={{ ...staggerDelay(1), textDecoration: 'none', color: 'inherit', display: 'block', cursor: 'pointer' }}
+              title="Read all 117+ Genuine Reviews on Google"
+            >
               <div className="trust-number">117+</div>
-              <div className="trust-label">Genuine Client Reviews</div>
-            </div>
+              <div className="trust-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                Genuine Client Reviews <ExternalLink size={12} />
+              </div>
+            </a>
             <div className="trust-item" data-reveal style={staggerDelay(2)}>
               <div className="trust-number">150+</div>
               <div className="trust-label">Growth Projects Delivered</div>
@@ -350,39 +399,26 @@ export const HomePage: React.FC = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '28px' }}>
-            {[
-              {
-                num: '01',
-                title: 'We Understand Before We Recommend.',
-                desc: 'No cookie-cutter templates or forced packages. We take the time to dissect your margins, sales cycles, and realistic commercial targets before suggesting a roadmap.'
-              },
-              {
-                num: '02',
-                title: 'Strategy Before Guesswork.',
-                desc: 'Every rupee invested in advertising, design, and software has a measurable intent. We establish transparent KPIs and clear conversion tracking upfront.'
-              },
-              {
-                num: '03',
-                title: 'Creativity With a Purpose.',
-                desc: 'Aesthetic elegance designed to do more than win compliments. We engineer visual identities and video narratives that capture attention, build trust, and drive conversions.'
-              },
-              {
-                num: '04',
-                title: 'Relationships Beyond Projects.',
-                desc: 'We are in this for the long haul. We celebrate your wins, stand beside you through market shifts, and continually optimize to compound your brand equity.'
-              }
-            ].map((item) => (
+            {CORE_PRINCIPLES.map((item, idx) => (
               <div
                 key={item.num}
-                className="glass-card-dark"
                 data-reveal
-                style={{ padding: '36px 28px', borderTop: '3px solid var(--color-tangerine)', ...staggerDelay(parseInt(item.num) - 1) }}
+                style={{
+                  padding: '36px 28px',
+                  background: 'rgba(40, 22, 46, 0.94)',
+                  border: '1.5px solid rgba(241, 138, 85, 0.45)',
+                  borderRadius: '20px',
+                  boxShadow: '0 15px 35px rgba(0, 0, 0, 0.3)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  ...staggerDelay(idx, 100)
+                }}
               >
-                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--color-tangerine)', opacity: 0.8, marginBottom: '16px' }}>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--color-tangerine)', opacity: 0.9, marginBottom: '16px', lineHeight: 1 }}>
                   {item.num}
                 </div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '14px', color: '#fff' }}>{item.title}</h3>
-                <p style={{ color: '#d2ccdc', fontSize: '0.95rem', lineHeight: '1.65' }}>{item.desc}</p>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '14px', color: '#fff', lineHeight: 1.35 }}>{item.title}</h3>
+                <p style={{ color: '#d2ccdc', fontSize: '0.95rem', lineHeight: '1.65', margin: 0 }}>{item.desc}</p>
               </div>
             ))}
           </div>
@@ -549,7 +585,7 @@ export const HomePage: React.FC = () => {
                     <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>{t.business_name}</span>
                   </div>
                   <a
-                    href="https://maps.app.goo.gl/dygytaly"
+                    href="https://share.google/0uskTCwteOiHO7Y1Y"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="badge badge-sage"
@@ -564,7 +600,7 @@ export const HomePage: React.FC = () => {
 
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <a
-              href="https://maps.app.goo.gl/dygytaly"
+              href="https://share.google/0uskTCwteOiHO7Y1Y"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline"
@@ -630,9 +666,6 @@ export const HomePage: React.FC = () => {
 
               {/* Interactive 3D Coffee Cup Component */}
               <ThreeCoffeeCanvas />
-              <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '8px' }}>
-                (Interactive 3D Espresso Cup — drag to rotate)
-              </p>
             </div>
 
             {/* Right: Working Enquiry Form */}

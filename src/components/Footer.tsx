@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, MapPin, MessageCircle, Star, ShieldCheck, ArrowUpRight } from 'lucide-react';
-import { Instagram, Facebook, Linkedin } from './SocialIcons';
+import { Instagram, Facebook, Linkedin, Google } from './SocialIcons';
 
 export const Footer: React.FC = () => {
   return (
@@ -22,15 +22,23 @@ export const Footer: React.FC = () => {
             </p>
 
             {/* Google Rating Badge */}
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px 16px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
-            }}>
+            <a
+              href="https://share.google/0uskTCwteOiHO7Y1Y"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '10px 16px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease',
+              }}
+              title="View Dygytaly Verified Google Profile & Reviews"
+            >
               <div style={{ display: 'flex', color: '#ffb703' }}>
                 <Star size={16} fill="#ffb703" />
                 <Star size={16} fill="#ffb703" />
@@ -41,10 +49,31 @@ export const Footer: React.FC = () => {
               <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>
                 4.9 / 5 <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 400 }}>(117 Google Reviews)</span>
               </span>
-            </div>
+              <ArrowUpRight size={14} style={{ color: 'var(--color-tangerine)' }} />
+            </a>
 
             {/* Social Icons */}
             <div style={{ display: 'flex', gap: '14px', marginTop: '22px' }}>
+              <a
+                href="https://share.google/0uskTCwteOiHO7Y1Y"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  transition: 'all 0.2s ease'
+                }}
+                aria-label="Dygytaly Google Business Profile"
+                title="Google Business Profile"
+              >
+                <Google size={18} />
+              </a>
               <a
                 href="https://www.instagram.com/dygytaly_official/?hl=en"
                 target="_blank"
@@ -162,12 +191,22 @@ export const Footer: React.FC = () => {
           {/* Col 4: Contact & Office */}
           <div className="footer-col">
             <h5>Visit & Connect</h5>
-            <p style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#c9c3cb', marginBottom: '14px', lineHeight: '1.5' }}>
+            <div style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#c9c3cb', marginBottom: '14px', lineHeight: '1.5' }}>
               <MapPin size={22} style={{ color: 'var(--color-tangerine)', flexShrink: 0, marginTop: '2px' }} />
-              <span>
-                3WVQ+WCV, Mettupalayam Main Road, Kothari Nagar, Sri Lakshmi Nagar, Thoppampatti Pirivu, K. Vadamadurai, Coimbatore, Tamil Nadu 641017, India.
-              </span>
-            </p>
+              <div>
+                <span>
+                  CV Towers, 3WVQ+WCV, Mettupalayam Main Road, Thoppampatti Pirivu, K. Vadamadurai, Coimbatore, Tamil Nadu 641017, India.
+                </span>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=DYGYTALY,+CV+Towers,+Thoppampatti+Pirivu,+Coimbatore+641017"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--color-tangerine)', marginTop: '4px', textDecoration: 'none', fontWeight: 600 }}
+                >
+                  Locate on Google Maps <ArrowUpRight size={13} />
+                </a>
+              </div>
+            </div>
             <p style={{ display: 'flex', gap: '10px', fontSize: '0.9rem', color: '#c9c3cb', marginBottom: '14px', alignItems: 'center' }}>
               <Phone size={18} style={{ color: 'var(--color-tangerine)', flexShrink: 0 }} />
               <a href="tel:+919677759959" style={{ color: '#fff' }}>+91 96777 59959</a>
